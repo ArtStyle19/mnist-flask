@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>MNIST – Predicción de dígitos</title>
+  <style>
+    body{font-family:system-ui;text-align:center;padding:2rem}
+    form{border:1px solid #ccc;padding:2rem;display:inline-block}
+  </style>
+</head>
+<body>
+  <h1>Sube una foto de un dígito</h1>
+  <form method="post" enctype="multipart/form-data">
+    <input type="file" name="image" accept="image/*" required><br><br>
+    <button type="submit">Predecir</button>
+  </form>
+</body>
+</html>
