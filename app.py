@@ -5,6 +5,9 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
 from preprocess import preprocess_image         # tu función de limpieza (28×28)
 
+
+# app_flask = Flask(__name__)
+
 # ── configuración de carpetas ────────────────────────────────────────────
 APP_ROOT   = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(APP_ROOT, "uploads")
