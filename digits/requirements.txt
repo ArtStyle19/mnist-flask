@@ -1,0 +1,16 @@
+# requirements.txt
+# ────────────────
+Flask>=3.0,<4.0          # micro-framework web
+gunicorn>=21.2           # servidor WSGI para producción (Linux)
+# Si prefieres Waitress en Windows, coméntalo y añade:  waitress>=3.0
+
+tensorflow>=2.16,<2.17   # incluye Keras; versión CPU
+# Para GPU en EC2 g4/g5: reemplaza por tensorflow[and-cuda]>=2.16
+
+opencv-python>=4.10      # cv2 (procesado de imágenes)
+Pillow>=10.3             # apertura y manipulación de imágenes
+numpy>=1.26              # operaciones numéricas
+
+scikit-image>=0.23       # umbral Sauvola (opcional pero recomendado)
+
+Werkzeug>=3.0            # ya viene como dependencia de Flask; se fija explícitamente
