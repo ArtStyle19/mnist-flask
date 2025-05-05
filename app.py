@@ -2,11 +2,14 @@ import os
 import numpy as np
 from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
+from preprocess import preprocess_image
+
+# noinspection PyUnresolvedReferences
 from tensorflow.keras.models import load_model
-from preprocess import preprocess_image         # tu función de limpieza (28×28)
 
+# Keras Nighltly
+# from keras.models import load_model
 
-# app_flask = Flask(__name__)
 
 # ── configuración de carpetas ────────────────────────────────────────────
 APP_ROOT   = os.path.dirname(os.path.abspath(__file__))
