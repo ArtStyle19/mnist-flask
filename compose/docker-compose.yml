@@ -1,0 +1,31 @@
+#version: "3.9"
+
+services:
+  digit-app:
+    build: ..
+    image: digit-app:latest
+    container_name: digit-app
+    restart: unless-stopped
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
+      interval: 30s
+      retries: 3
+
+  digit-nginx:
+    image: nginx:1.26
+    container_name: digit-nginx
+    depends_on:
+      digit-app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      # - "443:443"  ← when you enable TLS
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static-assets:/static:ro        # if you copy assets during build
+    restart: unless-stopped
+
+volumes:
+  static-assets:
