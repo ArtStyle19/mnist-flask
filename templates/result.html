@@ -4,30 +4,33 @@
   <meta charset="utf-8">
   <title>Resultado de la predicción</title>
   <style>
-    body{font-family:system-ui;text-align:center;padding:2rem}
-    img{max-width:280px;margin:1rem auto;border:1px solid #999}
-    table{margin:0 auto;border-collapse:collapse}
-    th,td{border:1px solid #ccc;padding:4px 12px}
-    th{background:#f0f0f0}
+    body { font-family: system-ui; text-align: center; padding: 2rem; }
+    table { margin: 1rem auto; border-collapse: collapse; }
+    td, th { padding: .4rem .8rem; border: 1px solid #ccc; }
+    img { border: 1px solid #999; }
   </style>
 </head>
 <body>
-  <h1>Predicción: {{ label }}</h1>
-  <p>Confianza global: {{ score }}</p>
 
-  <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Tu imagen">
+  <h1>Resultado</h1>
 
-  <h2>Confianza por dígito</h2>
+  <p><strong>Archivo:</strong> {{ filename }}</p>
+  <p><strong>Predicción:</strong> {{ label }} ({{ score }})</p>
+
+  <!-- mini‑imagen 28×28 ↑escalada -->
+  <img src="data:image/png;base64,{{ preview }}" width="140" height="140"
+       alt="Imagen preprocesada">
+
+  <h2>Probabilidades completas</h2>
   <table>
-    <tr><th>Dígito</th><th>Probabilidad</th></tr>
+    <tr><th>Dígito</th><th>Prob.</th></tr>
     {% for d, p in probs %}
-      <tr>
-        <td>{{ d }}</td>
-        <td>{{ "%.2f"|format(p*100) }} %</td>
+      <tr {% if d==label %}style="background:#eef"{% endif %}>
+        <td>{{ d }}</td><td>{{ "%.4f"|format(p) }}</td>
       </tr>
     {% endfor %}
   </table>
 
-  <p><a href="{{ url_for('index') }}">↩ Volver</a></p>
+  <p><a href="{{ url_for('index') }}">⟵ Volver</a></p>
 </body>
 </html>

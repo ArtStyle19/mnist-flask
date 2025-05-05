@@ -2,17 +2,136 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>MNIST – Predicción de dígitos</title>
+  <title>Predicción de Dígitos – Subida y Cámara</title>
   <style>
-    body{font-family:system-ui;text-align:center;padding:2rem}
-    form{border:1px solid #ccc;padding:2rem;display:inline-block}
+    body {font-family: system-ui; text-align:center; padding:2rem;}
+    form {border:1px solid #ccc; padding:2rem; display:inline-block; margin-bottom:2rem;}
+    video, canvas, img {border:1px solid #999;}
+    #result {font-size:1.5rem; margin-top:1rem;}
+    /* tabla de probabilidades */
+    #probs {margin:1rem auto; border-collapse:collapse;}
+    #probs td, #probs th {border:1px solid #ccc; padding:.3rem .6rem;}
+    #probs tr.highlight {background:#eef;}
   </style>
 </head>
 <body>
-  <h1>Sube una foto de un dígito</h1>
-  <form method="post" enctype="multipart/form-data">
+
+  <h1>Predicción de Dígitos</h1>
+
+  <!-- ▸ Subir imagen --------------------------------------------------------->
+  <h2>Subir una imagen</h2>
+  <form method="post" action="/predict/upload" enctype="multipart/form-data">
     <input type="file" name="image" accept="image/*" required><br><br>
-    <button type="submit">Predecir</button>
+    <button type="submit">Predecir desde archivo</button>
   </form>
+
+  <hr>
+
+  <!-- ▸ Cámara en vivo ------------------------------------------------------->
+  <h2>Usar cámara en vivo (predicción automática)</h2>
+
+  <!-- botón de arranque -->
+  <button id="start-btn">🔴 Iniciar cámara</button>
+
+  <!-- cámara + preview -->
+  <div style="display:flex; justify-content:center; gap:2rem; margin-top:1rem;">
+    <video id="video" width="280" height="280" autoplay muted></video>
+    <img   id="preview" width="140" height="140" alt="Preprocesado">
+  </div>
+
+  <!-- Canvas oculto para capturas -->
+  <canvas id="canvas" width="280" height="280" style="display:none;"></canvas>
+
+  <!-- resultado y tabla -->
+  <p id="result">Esperando predicciones...</p>
+
+  <table id="probs">
+    <thead>
+      <tr><th>Dígito</th><th>Prob.</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    /* ─────────── variables de interfaz ─────────────────────── */
+    const startBtn = document.getElementById('start-btn');
+    const video    = document.getElementById('video');
+    const canvas   = document.getElementById('canvas');
+    const ctx      = canvas.getContext('2d');
+    const result   = document.getElementById('result');
+    const preview  = document.getElementById('preview');
+    const tbody    = document.querySelector('#probs tbody');
+
+    /* ─────────── crear filas 0‑9 una sola vez ─────────────── */
+    for (let d = 0; d < 10; d++) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${d}</td><td id="p${d}">0.0000</td>`;
+      tbody.appendChild(tr);
+    }
+
+    /* ─────────── helpers de tabla ──────────────────────────── */
+    function resetHighlight() {
+      tbody.querySelectorAll('tr').forEach(tr => tr.classList.remove('highlight'));
+    }
+
+    /* ─────────── bucle de captura/predicción ──────────────── */
+    let intervalId = null;
+
+    async function captureAndPredict() {
+      // copiar frame → canvas
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataURL = canvas.toDataURL('image/png');
+
+      try {
+        const res  = await fetch('/predict/camera', {
+          method : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body   : JSON.stringify({ image_data: dataURL })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Sin éxito');
+
+        /* ---- A. texto & preview ---- */
+        result.innerHTML =
+          `Dígito detectado: <strong>${data.label}</strong> (${data.score})`;
+        preview.src = `data:image/png;base64,${data.preview}`;
+
+        /* ---- B. tabla ---- */
+        resetHighlight();
+        data.probs.forEach((p, d) => {
+          document.getElementById(`p${d}`).textContent = p.toFixed(4);
+          if (d === data.label) {
+            document.getElementById(`p${d}`).parentElement.classList.add('highlight');
+          }
+        });
+      } catch (err) {
+        console.error('Error al predecir:', err);
+        result.textContent = 'Error al enviar imagen.';
+        preview.removeAttribute('src');
+        resetHighlight();
+      }
+    }
+
+    /* ─────────── manejo del botón ─────────────────────────── */
+    startBtn.addEventListener('click', async () => {
+      if (intervalId) return;                 // ya está corriendo
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+
+        startBtn.disabled = true;
+        startBtn.textContent = '🟢 Cámara activa';
+
+        // primer disparo inmediato, luego cada 2 s
+        await captureAndPredict();
+        intervalId = setInterval(captureAndPredict, 2000);
+
+      } catch (err) {
+        console.error('Error al acceder a la cámara:', err);
+        result.textContent = 'No se pudo acceder a la cámara.';
+      }
+    });
+  </script>
+
 </body>
 </html>
