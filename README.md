@@ -24,6 +24,14 @@ Ofrece dos formas de predicción: subida de imagen y cámara en vivo y ha sido d
 - Tabla completa con probabilidades por clase
 - Despliegue listo para producción con Gunicorn y Nginx
 
+## Notas Técnicas
+
+- El preprocesamiento incluye:
+  - CLAHE para realce de contraste
+  - Umbral de Otsu + binarización adaptativa
+  - Redimensionado a 28×28 px + inversión binaria
+- Toda la inferencia es in-memory, no se almacenan archivos.
+
 ## Modelo CNN
 
 | Propiedad | Valor                           |
@@ -48,14 +56,6 @@ Ofrece dos formas de predicción: subida de imagen y cámara en vivo y ha sido d
 | Cámara – Dígito 7  | ![](readme-images/camera_digit_7.jpg) |
 | Cámara – Dígito 8  | ![](readme-images/camera_digit_8.jpg) |
 | Archivo – Dígito 4 | ![](readme-images/file_digit_4.jpg)   |
-
-## Notas Técnicas
-
-- El preprocesamiento incluye:
-  - CLAHE para realce de contraste
-  - Umbral de Otsu + binarización adaptativa
-  - Redimensionado a 28×28 px + inversión binaria
-- Toda la inferencia es in-memory, no se almacenan archivos.
 
 ## Licencia
 
