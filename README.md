@@ -35,15 +35,19 @@ Ofrece dos formas de predicción: subida de imagen y cámara en vivo y ha sido d
 
 ## Vista del Resultado
 
-### Captura desde cámara
+### Capturas
 
 - Imagen preprocesada (binaria 28×28)
 - Predicción del dígito + Probabilidad
 - Tabla detallada con todas las clases
 
-| Titulo   | Resultado Renderizado |
-| -------- | --------------------- |
-| Imagen 1 |                       |
+| Título             | Resultado Renderizado                 |
+| ------------------ | ------------------------------------- |
+| Cámara – Dígito 1  | ![](readme-images/camera_digit_1.jpg) |
+| Cámara – Dígito 5  | ![](readme-images/camera_digit_5.jpg) |
+| Cámara – Dígito 7  | ![](readme-images/camera_digit_7.jpg) |
+| Cámara – Dígito 8  | ![](readme-images/camera_digit_8.jpg) |
+| Archivo – Dígito 4 | ![](readme-images/file_digit_4.jpg)   |
 
 ## Notas Técnicas
 
